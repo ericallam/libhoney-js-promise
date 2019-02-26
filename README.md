@@ -1,6 +1,6 @@
 # libhoney-promise
 
-A wrapper for libhoney-js that provides support for sending events with a promises api
+A wrapper for [libhoney-js](https://github.com/honeycombio/libhoney-js) that provides support for sending events with a promises api
 
 [![Version](https://img.shields.io/npm/v/libhoney-promise.svg)](https://npmjs.org/package/libhoney-promise)
 [![Downloads/week](https://img.shields.io/npm/dw/libhoney-promise.svg)](https://npmjs.org/package/libhoney-promise)
