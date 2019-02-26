@@ -3,8 +3,8 @@
 A wrapper for libhoney-js that provides support for sending events with a promises api
 
 [![Version](https://img.shields.io/npm/v/libhoney-promise.svg)](https://npmjs.org/package/libhoney-promise)
-[![Downloads/week](https://img.shields.io/npm/dw/libhoney-promise.svg)](https://npmjs.org/package/libhoney-promise)
-[![License](https://img.shields.io/npm/l/libhoney-promise.svg)](https://github.com/ericallam/libhoney-promise/blob/master/package.json)
+[![Downloads/week](https://img.shields.io/npm/dw/libhoney-promise.svg)](https://npmjs.org/package/libhoney-js-promise)
+[![License](https://img.shields.io/npm/l/libhoney-promise.svg)](https://github.com/ericallam/libhoney-js-promise/blob/master/package.json)
 
 ## Installation
 
