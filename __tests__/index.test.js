@@ -1,0 +1,81 @@
+const uuid = require("uuid");
+const { createHoneyClient } = require("../");
+
+test("sending an event should return a promise that resolves to the response", () => {
+  const honeyClient = createHoneyClient({
+    writeKey: process.env.HONEYCOMBIO_WRITE_KEY,
+    dataset: process.env.HONEYCOMBIO_DATASET
+  });
+
+  const spanId = uuid.v4();
+  const traceId = uuid.v4();
+  const timestamp = new Date().toJSON();
+
+  return expect(
+    honeyClient.sendEventNow({
+      service_name: "LogTesting",
+      level: "TRACE",
+      name: "start-receipt-verification",
+      "trace.span_id": spanId,
+      "trace.trace_id": traceId,
+      duration_ms: 6359.654862,
+      timestamp: timestamp
+    })
+  ).resolves.toMatchObject({
+    status_code: 202,
+    duration: expect.any(Number),
+    metadata: { promiseId: spanId },
+    error: undefined
+  });
+});
+
+test("sending an event is dropped by being sampled should result in a resolved promise", () => {
+  const honeyClient = createHoneyClient({
+    writeKey: process.env.HONEYCOMBIO_WRITE_KEY,
+    dataset: process.env.HONEYCOMBIO_DATASET,
+    sampleRate: Number.MAX_SAFE_INTEGER
+  });
+
+  const spanId = uuid.v4();
+  const traceId = uuid.v4();
+  const timestamp = new Date().toJSON();
+
+  return expect(
+    honeyClient.sendEventNow({
+      service_name: "LogTesting",
+      level: "TRACE",
+      name: "start-receipt-verification",
+      "trace.span_id": spanId,
+      "trace.trace_id": traceId,
+      duration_ms: 6359.654862,
+      timestamp: timestamp
+    })
+  ).resolves.toMatchObject({ dropped: true });
+});
+
+test("sending many events works", () => {
+  const honeyClient = createHoneyClient({
+    writeKey: process.env.HONEYCOMBIO_WRITE_KEY,
+    dataset: process.env.HONEYCOMBIO_DATASET
+  });
+
+  const eventCount = 1000;
+
+  const allPromises = Array.from({ length: eventCount }).map((_e, i) => {
+    const spanId = uuid.v4();
+    const traceId = uuid.v4();
+    const timestamp = new Date().toJSON();
+
+    return honeyClient.sendEventNow({
+      service_name: "LogTesting",
+      level: "TRACE",
+      name: "start-receipt-verification",
+      "trace.span_id": spanId,
+      "trace.trace_id": traceId,
+      duration_ms: 100 + i,
+      timestamp: timestamp
+    });
+  });
+
+  return expect(Promise.all(allPromises)).resolves.toHaveLength(eventCount);
+});
