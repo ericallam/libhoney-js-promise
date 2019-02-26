@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "A wrapper for libhoney-js that provides support for sending events with a promises api",
   "main": "index.js",
-  "repository": "https://github.com/solve-hq/libhoney-js-promises",
+  "repository": "https://github.com/ericallam/libhoney-js-promise",
   "author": "Eric Allam",
   "license": "MIT",
   "devDependencies": {
