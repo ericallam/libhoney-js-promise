@@ -13,8 +13,8 @@ const wrapHoneyClient = options => {
 
         if (promise) {
           if (error) {
-            promise.resolve({ dropped: true });
             if (error.message.match(/event dropped due to sampling/)) {
+              promise.resolve({ dropped: true });
             } else {
               promise.reject(error);
             }
@@ -33,7 +33,7 @@ const wrapHoneyClient = options => {
   return {
     sendEventNow: data => {
       return new Promise((resolve, reject) => {
-        const promiseId = data["trace.span_id"] || uuid.v4();
+        const promiseId = uuid.v4();
 
         promises[promiseId] = { resolve, reject };
 
