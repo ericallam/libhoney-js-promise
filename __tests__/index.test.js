@@ -24,7 +24,6 @@ test("sending an event should return a promise that resolves to the response", (
   ).resolves.toMatchObject({
     status_code: 202,
     duration: expect.any(Number),
-    metadata: { promiseId: spanId },
     error: undefined
   });
 });
@@ -78,4 +77,32 @@ test("sending many events works", () => {
   });
 
   return expect(Promise.all(allPromises)).resolves.toHaveLength(eventCount);
+});
+
+test("sending two events with the same spanId works", () => {
+  const honeyClient = createHoneyClient({
+    writeKey: process.env.HONEYCOMBIO_WRITE_KEY,
+    dataset: process.env.HONEYCOMBIO_DATASET
+  });
+
+  const spanId = uuid.v4();
+  const traceId = uuid.v4();
+
+  const allPromises = [{ spanId, traceId }, { spanId, traceId }].map(
+    (_e, i) => {
+      const timestamp = new Date().toJSON();
+
+      return honeyClient.sendEventNow({
+        service_name: "LogTesting",
+        level: "TRACE",
+        name: "start-receipt-verification",
+        "trace.span_id": spanId,
+        "trace.trace_id": traceId,
+        duration_ms: 100 + i,
+        timestamp: timestamp
+      });
+    }
+  );
+
+  return expect(Promise.all(allPromises)).resolves.toHaveLength(2);
 });
