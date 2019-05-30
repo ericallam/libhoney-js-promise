@@ -12,7 +12,11 @@ const wrapHoneyClient = options => {
       if (metadata.promiseId) {
         const promise = promises[metadata.promiseId];
 
+        promises[metadata.promiseId] = undefined;
+
         if (promise) {
+          clearTimeout(promise.timeoutId);
+
           if (error) {
             if (error.message.match(/event dropped due to sampling/)) {
               promise.resolve({ dropped: true });
@@ -27,6 +31,22 @@ const wrapHoneyClient = options => {
         }
       }
     });
+  };
+
+  const triggerPromiseTimeout = promiseId => {
+    const promise = promises[promiseId];
+    promises[promiseId] = undefined;
+
+    if (promise) {
+      debug("Sending event to honeycomb.io timed out %s", promiseId);
+
+      promise.reject(`Sending event to honeycomb.io timed out (5000ms)`);
+    } else {
+      debug(
+        "Promise timeout triggered for promiseId %s but there was no promise present",
+        promiseId
+      );
+    }
   };
 
   const honey = new Libhoney({ ...options, responseCallback });
@@ -50,7 +70,10 @@ const wrapHoneyClient = options => {
           return resolve(event);
         }
 
-        promises[promiseId] = { resolve, reject };
+        // If the promise hasn't been resolved in 5 seconds, reject it with a timeout error
+        const timeoutId = setTimeout(triggerPromiseTimeout, 5000, promiseId);
+
+        promises[promiseId] = { resolve, reject, timeoutId };
 
         const event = honey.newEvent();
         event.add(data);

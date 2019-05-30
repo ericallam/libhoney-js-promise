@@ -52,6 +52,32 @@ test("sending an event is dropped by being sampled should result in a resolved p
   ).resolves.toMatchObject({ dropped: true });
 });
 
+test("sending an event that takes longer than 5 seconds to send should result in a rejected promise", () => {
+  jest.setTimeout(10000);
+
+  const honeyClient = createHoneyClient({
+    writeKey: process.env.HONEYCOMBIO_WRITE_KEY,
+    dataset: process.env.HONEYCOMBIO_DATASET,
+    disabled: true
+  });
+
+  const spanId = uuid.v4();
+  const traceId = uuid.v4();
+  const timestamp = new Date().toJSON();
+
+  return expect(
+    honeyClient.sendEventNow({
+      service_name: "LogTesting",
+      level: "TRACE",
+      name: "start-receipt-verification",
+      "trace.span_id": spanId,
+      "trace.trace_id": traceId,
+      duration_ms: 6359.654862,
+      timestamp: timestamp
+    })
+  ).rejects.toMatch("Sending event to honeycomb.io timed out");
+});
+
 test("sending many events works", () => {
   const honeyClient = createHoneyClient({
     writeKey: process.env.HONEYCOMBIO_WRITE_KEY,
