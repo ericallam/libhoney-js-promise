@@ -1,6 +1,6 @@
 {
   "name": "libhoney-promise",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A wrapper for libhoney-js that provides support for sending events with a promises api",
   "main": "index.js",
   "repository": "https://github.com/ericallam/libhoney-js-promise",
