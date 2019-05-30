@@ -18,6 +18,7 @@
     "test": "jest --setupFiles dotenv/config"
   },
   "dependencies": {
+    "debug": "^4.1.1",
     "uuid": "^3.3.2"
   },
   "files": [

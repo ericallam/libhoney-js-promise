@@ -1,5 +1,6 @@
 const Libhoney = require("libhoney");
 const uuid = require("uuid");
+const debug = require("debug")("libhoney-promise");
 
 const wrapHoneyClient = options => {
   const promises = {};
@@ -34,6 +35,20 @@ const wrapHoneyClient = options => {
     sendEventNow: data => {
       return new Promise((resolve, reject) => {
         const promiseId = uuid.v4();
+
+        if (promises[promiseId]) {
+          debug(
+            `promiseId collision with existing promise ${promiseId}, sending event with immediately resolved promise`
+          );
+
+          const event = honey.newEvent();
+          event.add(data);
+          event.timestamp =
+            data.timestamp || data.Timestamp || data["@timestamp"];
+          event.send();
+
+          return resolve(event);
+        }
 
         promises[promiseId] = { resolve, reject };
 
