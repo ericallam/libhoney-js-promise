@@ -28,6 +28,34 @@ test("sending an event should return a promise that resolves to the response", (
   });
 });
 
+test("sending an event with a custom dataset", () => {
+  const honeyClient = createHoneyClient({
+    writeKey: process.env.HONEYCOMBIO_WRITE_KEY,
+    dataset: process.env.HONEYCOMBIO_DATASET
+  });
+
+  const spanId = uuid.v4();
+  const traceId = uuid.v4();
+  const timestamp = new Date().toJSON();
+
+  return expect(
+    honeyClient.sendEventNow({
+      service_name: "LogTesting",
+      level: "TRACE",
+      name: "start-receipt-verification",
+      "trace.span_id": spanId,
+      "trace.trace_id": traceId,
+      duration_ms: 6359.654862,
+      timestamp: timestamp,
+      dataset: "test-custom-event-dataset"
+    })
+  ).resolves.toMatchObject({
+    status_code: 202,
+    duration: expect.any(Number),
+    error: undefined
+  });
+});
+
 test("sending an event is dropped by being sampled should result in a resolved promise", () => {
   const honeyClient = createHoneyClient({
     writeKey: process.env.HONEYCOMBIO_WRITE_KEY,

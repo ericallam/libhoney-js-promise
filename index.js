@@ -65,7 +65,10 @@ const wrapHoneyClient = options => {
           event.add(data);
           event.timestamp =
             data.timestamp || data.Timestamp || data["@timestamp"];
-          event.send();
+
+          if (data.dataset) {
+            event.dataset = data.dataset;
+          }
 
           return resolve(event);
         }
@@ -79,6 +82,11 @@ const wrapHoneyClient = options => {
         event.add(data);
         event.timestamp =
           data.timestamp || data.Timestamp || data["@timestamp"];
+
+        if (data.dataset) {
+          event.dataset = data.dataset;
+        }
+
         event.metadata = { promiseId };
         event.send();
       });
